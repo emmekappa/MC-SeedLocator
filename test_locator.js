@@ -1,7 +1,7 @@
 import { getAreaResult } from "./locator.js";
 
 getAreaResult(
-  "4684276156830303372",
+  "1675696067",
   [0, 0],
   [
     // "buriedTreasure",
@@ -10,8 +10,8 @@ getAreaResult(
     // "bastionRemnant",
     // "endCity",
     // "slimeChunk",
-    "stronghold",
-    "village",
+    // "stronghold",
+    // "village",
     // "mineshaft",
     // "woodlandMansion",
     // "pillagerOutpost",
@@ -20,8 +20,8 @@ getAreaResult(
     // "shipwreck",
     // "desertTemple",
     // "jungleTemple",
-    "witchHut",
-    "igloo",
+    //"witchHut",
+    //"igloo",
     // "ruinedPortalOverworld",
     // "ruinedPortalNether",
     // "spawn",
@@ -29,11 +29,14 @@ getAreaResult(
     // "ravine",
     // "endGateway",
     // "amethystGeode",
-    // "ancientCity",
+    "ancientCity",
     // "itemOverworld",
     // "oreVein",
     // "cave",
     // "desertWell",
     // "trailRuin",
   ],
+  {
+
+  },
 ).then(console.log);

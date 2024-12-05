@@ -188,6 +188,7 @@ function a(b, c) {
   return b === c;
 }
 function finder(c) {
+
   if (!a(i, c)) {
     var d = Object.assign({}, c.platform.cb3World, {
       seed: CB3Libs.Long.fromString(c.seed),
@@ -303,12 +304,13 @@ function findClosest(coords, features) {
 export async function getAreaResult(seed, coords, pois, optionals) {
   let params = {
     tileSize: 16,
-    searchWidth: 8,
-    edition: "Java",
-    javaVersion: 10200,
+    searchWidth: 20,
+    edition: "Bedrock",
+    //javaVersion: 10210,
+    bedrockVersion: 10210,
     tileScale: 0.25,
     dimension: "overworld",
-    biomeHeight: "worldSurface",
+    biomeHeight: "worlSurface",
   };
   if (optionals) {
     params = { ...params, ...optionals };
@@ -326,6 +328,7 @@ export async function getAreaResult(seed, coords, pois, optionals) {
         cb3World: {
           edition: params.edition,
           javaVersion: params.javaVersion,
+          bedrockVersion: params.bedrockVersion,
           config: {},
         },
       },
