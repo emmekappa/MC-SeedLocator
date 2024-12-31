@@ -1,9 +1,29 @@
-import {EventEmitter} from "events";
-import {superComplexWasm} from "./inline_worker.mjs";
+//import {EventEmitter} from "events";
+import {superComplexWasm} from "./chunky.mjs";
 
-globalThis.emitter = new EventEmitter();
+// class MyEventEmitter {
+//   constructor() {
+//     this.events = {};
+//   }
+//
+//   on(event, listener) {
+//     if (!this.events[event]) {
+//       this.events[event] = [];
+//     }
+//     this.events[event].push(listener);
+//     return this;
+//   }
+//
+//   emit(event, ...args) {
+//     if (this.events[event]) {
+//       this.events[event].forEach(listener => listener(...args));
+//     }
+//   }
+// }
+//
+// globalThis.emitter = new MyEventEmitter();
+
 let CB3Libs = superComplexWasm();
-
 
 var jsonStableStringify = function () {
   var a = function (a, d) {
@@ -58,53 +78,53 @@ var jsonStableStringify = function () {
   return a
 }();
 
-let CB3SharedTaskManager = {
-  create: function (a) {
-    var b = {};
-    return globalThis.emitter.addListener("message", function (c) {
-      if ("sharedTaskResult" === c.data.type) {
-        var d = c.data.key;
-        if (!b[d]) return;
-        b[d].onResult(c.data.result), delete b[d]
-      } else if ("sharedTaskPerform" === c.data.type) {
-        var d = c.data.key;
-        if (!b[d]) return;
-        b[d].performTask().then(function (c) {
-          a.postMessage({type: "sharedTaskPerformResult", key: d, result: c}), b[d].onResult(c), delete b[d]
-        }).catch(function (a) {
-          throw a
-        })
-      }
-    }), {
-      handleTask: function (c, d) {
-        if (b[c]) throw new Error("task already exists");
-        return new Promise(function (e) {
-          b[c] = {onResult: e, performTask: d}, a.postMessage({type: "sharedTaskGet", key: c})
-        })
-      }
-    }
-  }
-};
+// let CB3SharedTaskManager = {
+//   create: function (a) {
+//     var b = {};
+//     return globalThis.emitter.on("message", function (c) {
+//       if ("sharedTaskResult" === c.data.type) {
+//         var d = c.data.key;
+//         if (!b[d]) return;
+//         b[d].onResult(c.data.result), delete b[d]
+//       } else if ("sharedTaskPerform" === c.data.type) {
+//         var d = c.data.key;
+//         if (!b[d]) return;
+//         b[d].performTask().then(function (c) {
+//           a.postMessage({type: "sharedTaskPerformResult", key: d, result: c}), b[d].onResult(c), delete b[d]
+//         }).catch(function (a) {
+//           throw a
+//         })
+//       }
+//     }), {
+//       handleTask: function (c, d) {
+//         if (b[c]) throw new Error("task already exists");
+//         return new Promise(function (e) {
+//           b[c] = {onResult: e, performTask: d}, a.postMessage({type: "sharedTaskGet", key: c})
+//         })
+//       }
+//     }
+//   }
+// };
 
-function a(b, c) {
+function deepEqual(b, c) {
   if ("object" == typeof b && null != b && "object" == typeof c && null != c) {
     var d = [0, 0];
     for (var e in b) d[0]++;
     for (var e in c) d[1]++;
     if (d[0] - d[1] !== 0) return !1;
-    for (var e in b) if (!(e in c && a(b[e], c[e]))) return !1;
-    for (var e in c) if (!(e in b && a(c[e], b[e]))) return !1;
+    for (var e in b) if (!(e in c && deepEqual(b[e], c[e]))) return !1;
+    for (var e in c) if (!(e in b && deepEqual(c[e], b[e]))) return !1;
     return !0
   }
   return b === c
 }
 
-function b(a) {
+function stringHash(a) {
   for (var b = 0, c = 0; b < a.length; b++) c = Math.imul(31, c) + a.charCodeAt(b) | 0;
   return c
 }
 
-function c(a, b, c) {
+function getBiomeData(a, b, c) {
   if (a.getNoiseBiomeAreaAtHeightType) {
     var d = c.tileScale;
     if (!c.showBiomes) return null;
@@ -122,20 +142,20 @@ function c(a, b, c) {
   return {biomes: i, scale: 1}
 }
 
-function d(a, b, c) {
+function getChunkBiomeData(a, b, c) {
   if (!c.showBiomes) return null;
   var d = a.getChunkArea(b.x, b.z, b.sizeX, b.sizeZ);
   return {biomes: d.buffer, scale: 1}
 }
 
 function finder(c) {
-  if (!a(i, c)) {
+  if (!deepEqual(i, c)) {
     var d = Object.assign({}, c.platform.cb3World, {seed: CB3Libs.Long.fromString(c.seed)});
-    h && (h[CB3Libs.Dimension.Overworld] && h[CB3Libs.Dimension.Overworld].free(), h[CB3Libs.Dimension.Nether] && h[CB3Libs.Dimension.Nether].free(), h[CB3Libs.Dimension.End] && h[CB3Libs.Dimension.End].free(), h = null), g && (g.free(), g = null), h = {}, h[CB3Libs.Dimension.Overworld] = CB3Libs.createBiomeProvider(d), h[CB3Libs.Dimension.Nether] = new CB3Libs.BiomeProviderNether(d), h[CB3Libs.Dimension.End] = new CB3Libs.BiomeProviderEnd(d);
-    var e = b(jsonStableStringify(d));
-    g = CB3Libs.createPoiFinder(d, h, {
+    h && (h[CB3Libs.Dimension.Overworld] && h[CB3Libs.Dimension.Overworld].free(), h[CB3Libs.Dimension.Nether] && h[CB3Libs.Dimension.Nether].free(), h[CB3Libs.Dimension.End] && h[CB3Libs.Dimension.End].free(), h = null), poiFinder && (poiFinder.free(), poiFinder = null), h = {}, h[CB3Libs.Dimension.Overworld] = CB3Libs.createBiomeProvider(d), h[CB3Libs.Dimension.Nether] = new CB3Libs.BiomeProviderNether(d), h[CB3Libs.Dimension.End] = new CB3Libs.BiomeProviderEnd(d);
+    var e = stringHash(jsonStableStringify(d));
+    poiFinder = CB3Libs.createPoiFinder(d, h, {
       sharedTask: function (a, b) {
-        return j.handleTask(e + "--" + a, b)
+        return taskManager.handleTask(e + "--" + a, b)
       }
     }), i = c
   }
@@ -145,9 +165,9 @@ export function getResults(a) {
   var b = a.tile, f = a.params;
   finder({seed: f.seed, platform: f.platform});
   var i = {x: b.x, z: b.z, sizeX: b.xL, sizeZ: b.zL};
-  return g(i, f.pois).then(function (a) {
+  return poiFinder(i, f.pois).then(function (a) {
     var b = null, e = h[f.dimension];
-    return f.dimension === CB3Libs.Dimension.Overworld ? b = c(e, i, f) : f.dimension === CB3Libs.Dimension.Nether ? b = d(e, i, f) : f.dimension === CB3Libs.Dimension.End && (b = d(e, i, f)), {
+    return f.dimension === CB3Libs.Dimension.Overworld ? b = getBiomeData(e, i, f) : f.dimension === CB3Libs.Dimension.Nether ? b = getChunkBiomeData(e, i, f) : f.dimension === CB3Libs.Dimension.End && (b = getChunkBiomeData(e, i, f)), {
       biomes: b ? b.biomes : null,
       biomeScale: b ? b.scale : 1,
       heights: b ? b.heights : null,
@@ -157,23 +177,24 @@ export function getResults(a) {
   })
 }
 
-var g = null, h = null, i = null, j = CB3SharedTaskManager.create(globalThis);
-globalThis.emitter.addListener("message", function (a) {
-  if ("check" === a.data.type) Promise.resolve().then(function () {
-    return getResults(a.data)
-  }).then(function (a) {
-    postMessage({type: "check", results: a})
-  }, function (a) {
-    postMessage({
-      type: "check", results: {
-        error: !0, errorStr: a.toString(), errorStack: "string" == typeof a.stack ? a.stack.slice(0, 150) : ""
-      }
-    })
-  }); else if ("getSupportedPois" === a.data.type) {
-    var b = a.data.platform.cb3World, c = CB3Libs.getSupportedPois(b);
-    c.push("biomes"), postMessage({type: "getSupportedPois", supportedPois: c, platform: a.data.platform})
-  }
-})
+var poiFinder = null, h = null, i = null;
+// var taskManager = CB3SharedTaskManager.create(globalThis);
+// globalThis.emitter.on("message", function (a) {
+//   if ("check" === a.data.type) Promise.resolve().then(function () {
+//     return getResults(a.data)
+//   }).then(function (a) {
+//     postMessage({type: "check", results: a})
+//   }, function (a) {
+//     postMessage({
+//       type: "check", results: {
+//         error: !0, errorStr: a.toString(), errorStack: "string" == typeof a.stack ? a.stack.slice(0, 150) : ""
+//       }
+//     })
+//   }); else if ("getSupportedPois" === a.data.type) {
+//     var b = a.data.platform.cb3World, c = CB3Libs.getSupportedPois(b);
+//     c.push("biomes"), postMessage({type: "getSupportedPois", supportedPois: c, platform: a.data.platform})
+//   }
+// })
 
 export function getSupportedPPois(cb3world) {
   let c = CB3Libs.getSupportedPois(cb3world);

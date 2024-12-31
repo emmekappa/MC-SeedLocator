@@ -1,0 +1,18 @@
+{
+  "name": "cb3",
+  "version": "0.1.0",
+  "main": "dist/locator.js",
+  "type": "module",
+  "scripts": {
+    "build": "rollup -c",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "@rollup/plugin-babel": "^6.0.4",
+    "rollup": "^4.28.1",
+    "rollup-plugin-base64": "^1.0.1",
+    "rollup-plugin-polyfill-node": "^0.13.0"
+  }
+}
